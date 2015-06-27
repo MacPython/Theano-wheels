@@ -1,0 +1,6 @@
+[submodule "Theano"]
+	path = Theano
+	url = git://github.com/Theano/Theano.git
+[submodule "terryfy"]
+	path = terryfy
+	url = git://github.com/MacPython/terryfy.git
