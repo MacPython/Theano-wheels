@@ -3,18 +3,20 @@ language:
 env:
   global:
   - BUILD_COMMIT='latest-tag'  # comment out to build version in submodule
+  - PROJECT=Theano
   matrix:
-  - VERSION=2.7.9 NUMPY_VERSION=1.6.2 # tune to taste
+  - VERSION=2.7.10 NUMPY_VERSION=1.6.2 # tune to taste
   - VERSION=3.3.5 NUMPY_VERSION=1.7.1
   - VERSION=3.4.3 NUMPY_VERSION=1.7.1
 install:
   - source terryfy/travis_tools.sh
   - get_python_environment macpython $VERSION venv
   - pip install delocate numpy==$NUMPY_VERSION
+  - pip install scipy six
   - if [ -n "$BUILD_COMMIT" ]; then
-        checkout_commit Theano $BUILD_COMMIT;
+        checkout_commit $PROJECT $BUILD_COMMIT;
     fi
-  - cd Theano
+  - cd $PROJECT
   - python setup.py bdist_wheel
   - delocate-listdeps dist/*.whl # lists library dependencies
   - delocate-wheel dist/*.whl # copies library dependencies into wheel
@@ -26,13 +28,14 @@ script:
   - mkdir tmp_for_test
   - cd tmp_for_test
   # Run the tests
+  - theano-test
   - cd ..
-before_deploy: cd Theano/dist
+before_deploy: cd $PROJECT/dist
 deploy:
   provider: cloudfiles
   username: travis-worker
   api_key:
-    secure: ALZrkCwjz3nY/9GfTNPgVQHUmUpCc5SnZTaqIUlJrhVyOBu6aktXaRmQi+sTXzFn7a/PQsYDnoZ8nibCZ472oUVDGUOSbtjIEkPodU+aisLN2dSLNueQsUU7Dmt0SaeyJVGovzfyUiavIYLuAfOtCfUKrwAsi7XTVNQpdyWCQDs=
+    secure: "0OYelFLadJA/JHR3Am1R1mpokn0f497eDY+yQhwPxxuzJvQuma/Oq8CmUZJlOsVRA+MbgA2OVOSw6Bai8UfASRvUkfNyheJO6NJwPvuii76hHfg4FvDrzlLVtEJxC9XgwRtrMgDnZ1RENrT7Z8sVPOPiQl1cJXkNsbMb4+nM/WwC8Y+Jd8Tl5PmQ0gttmx5S58ItSi6XYE2Gly1O+JwLKktONtgLjPQ+yTL3CrC8MbU1wIcqeXt8lpNxhMJLMhryrNu+xer5pJFeikg/z9i/TSwt2ecPPwU+0AAAghvzNVMssB/gpUPaTfyR3ZtHaNSNDu5wFXGEbxxllSFEIPTgS7E7y2n2Ux8ghEskf3se+6ud0X9Hcv48nzgTCkfE66Y3aG8Z5Fks6hvO7d1TDb9CN8npt5/fvJIPDEYbkgKSahAdJVDgqKGtRsJ0XoYpEu2gwF0Aml5Rzg+KXhOf2woUd3emoxilWnSSAiCZn6TmIH7qqMIuD/jnhxN8m6A+E9QVVhFsbPFzqlDWIVEOBQSKCHlaxqj/xmBlQETa8vPe/54qN0FkT0z4dWRQhUhiDPfrSXh6Px+AZXRHiyfhgDEPWlMLUUn+hONkzG864vkoba8veG9WB6Bn1iEoglSLnuaIg0UXI5RYJ49mUqA47wcnxV/niC6ueCeZWB+N/2v8fE8="
   region: ORD
   container: wheels
   skip_cleanup: true
